@@ -12,10 +12,12 @@ For example, if you are running on 1.16, then running `scoreboard players get ve
 
 Server version is also stored within the `version` scoreboard, under `server`.
 
+
+
 Listed below are the associations between server software and the scoreboard value:
 
 Server Software | Singleplayer | Vanilla | Spigot | Paper | Airplane | Purpur
---- | --- | --- | --- |--- |--- |--- |---
+--- | --- | --- | --- |--- |--- |---
 Scoreboard Value | 0 | 1 | 2 | 3 | 5 | 6
 
 For example, if you are running a Vanilla server, running `scoreboard players get server version` will return 1. 
