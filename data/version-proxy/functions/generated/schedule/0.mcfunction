@@ -11,3 +11,5 @@ execute store result score _server version run data get block -30000000 23 1602 
 execute if score _server version matches 1 run scoreboard players set server version 5
 execute store result score _server version run data get block -30000000 24 1602 SuccessCount
 execute if score _server version matches 1 run scoreboard players set server version 6
+execute store result score _server version run data get block -30000000 20 1603 SuccessCount
+execute if score _server version matches 1 run scoreboard players set modded version 1

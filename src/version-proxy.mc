@@ -2,9 +2,12 @@ function load {
     scoreboard objectives add version dummy
     scoreboard players set server version 0
     scoreboard players set version version 0
+    scoreboard players set modded version 0
     forceload add -30000000 1602
 
     function version-proxy:check_version
+
+    schedule function version-proxy:check_version 2s replace
 }
 
 function tick {
@@ -22,10 +25,13 @@ function check_version {
     function version-proxy:versions/1.17
 
     function version-proxy:versions/is_server
+    function version-proxy:versions/is_modded
 
-    execute if score version version matches 1.. run tellraw @s [{"text":"\nDatapack loaded on MC version 1.","color":"yellow"},{"score":{"name":"version","objective":"version"}},{"text":"."}]
+    execute if score version version matches 1.. if score modded version matches 0 run tellraw @s [{"text":"\nDatapack loaded on MC version 1.","color":"yellow"},{"score":{"name":"version","objective":"version"}},{"text":"."}]
+    execute if score version version matches 1.. if score modded version matches 1 run tellraw @s [{"text":"\nDatapack loaded on MC version 1.","color":"yellow"},{"score":{"name":"version","objective":"version"}},{"text":"."}, {"text":" (Modded with Forge)","color":"green","italic": true}]
     execute if score version version matches ..0 run tellraw @a [{"text":"\nError: Unknown Minecraft Version detected.","color":"red","bold":true}]
-    execute if score server version matches 1 run tellraw @s [{"text":"(Running on a vanilla server)","color":"aqua"}]
+    execute if score server version matches 1 if score modded version matches 0 run tellraw @s [{"text":"(Running on a vanilla server)","color":"aqua"}]
+    execute if score server version matches 1 if score modded version matches 1 run tellraw @s [{"text":"(Running on a Forge server)","color":"aqua"}]
     execute if score server version matches 2 run tellraw @s [{"text":"(Running on a Spigot server)","color":"aqua"}]
     execute if score server version matches 3 run tellraw @s [{"text":"(Running on a Paper server)","color":"aqua"}]
     execute if score server version matches 5 run tellraw @s [{"text":"(Running on a Airplane server)","color":"aqua"}]
@@ -33,16 +39,25 @@ function check_version {
 
     schedule 2t replace {
         # Check success status of command block
+        # Vanilla server test
         execute store result score _server version run data get block -30000000 20 1602 SuccessCount
         execute if score _server version matches 1 run scoreboard players set server version 1
+        # Spigot server test
         execute store result score _server version run data get block -30000000 21 1602 SuccessCount
         execute if score _server version matches 1 run scoreboard players set server version 2
+        # Paper server test
         execute store result score _server version run data get block -30000000 22 1602 SuccessCount
         execute if score _server version matches 1 run scoreboard players set server version 3
+        # Airplane server test (unable to test for tuinity)
         execute store result score _server version run data get block -30000000 23 1602 SuccessCount
         execute if score _server version matches 1 run scoreboard players set server version 5
+        # Purpur server test
         execute store result score _server version run data get block -30000000 24 1602 SuccessCount
         execute if score _server version matches 1 run scoreboard players set server version 6
+
+        # Forge test
+        execute store result score _server version run data get block -30000000 20 1603 SuccessCount
+        execute if score _server version matches 1 run scoreboard players set modded version 1
     }
 }
 
@@ -79,6 +94,12 @@ dir versions {
         setblock -30000000 22 1602 command_block{auto:1b,Command:"paper:paper"} destroy
         setblock -30000000 23 1602 command_block{auto:1b,Command:"airplane:airplane"} destroy
         setblock -30000000 24 1602 command_block{auto:1b,Command:"purpur:purpur"} destroy
+    }
+
+    function is_modded {
+        # Check for forge
+        setblock -30000000 20 1603 command_block{auto:1b,Command:"forge tps minecraft:overworld"} destroy
+        # Unknown if I can test for fabric yet
     }
 }
 
